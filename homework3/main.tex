@@ -1,0 +1,233 @@
+\documentclass[11pt]{article}
+\usepackage{course}
+\usepackage{upquote}
+\usepackage{minted}
+\fvset{frame=single}
+
+
+
+
+\begin{document}
+
+%\title{\vspace{-0.5in}HMC CS 158, Fall 2015\\Problem Set 2: MLE, Linear Regression}
+\ctitle{3}{Computational Learning Theory, Kernel, SVM}{ 11:59pm November 25, 2019}
+\author{}
+\date{}
+\maketitle
+\vspace{-0.75in}
+\vspace{-11pt}
+%\blfootnote{Parts of this assignment are adapted from course material by Andrew Ng (Stanford), Jenna Wiens (UMich), and Tom Mitchell and Maria-Florina Balcan (CMU).}
+\blfootnote{Parts of this assignment are adapted from course material by Andrew Ng (Stanford), Jenna Wiens (UMich) and Jessica Wu (Harvey Mudd).}
+%TODO
+
+\ifsoln
+\else
+\section*{Submission}
+\begin{itemize}
+\item 
+Submit your solutions electronically on the course Gradescope site as PDF files.
+\item If you plan to typeset your solutions, please use the LaTeX solution template. If you must submit scanned handwritten solutions, please use a black pen on blank white paper and a high-quality scanner app.
+\item Please use Python 3 for the coding.
+\item  \url{https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html}, \url{https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html}, \url{https://scikit- learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html}, \url{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html} are some useful links. 
+\item Make sure to use ``SVC.decision\_function(X)'', {\bf NOT} ``SVC.predict(X)''!!! As ``performance()'' method maps continuous-valued predictions to binary labels itself.
+\item Read all the comment lines from the starting of the provided source code.
+\item Questions with \problemworth{0} points means this is a part of another questions. So you need to answer this anyway. Then you need to answer the other question to get the full points. For example in section \ref{sec:linear}, question (a) is a part of question (b) where (a) has 0 points and (b) has the full 10 points.
+\end{itemize}
+\fi
+
+\ifnotsolution{\newpage}
+
+
+
+
+
+\section{Kernels \problemworth{30}}
+% MIT 6.867, Fall 2008, HW2, Q1ei (modified)
+ Given vectors $\vect{x}$ and $\vect{z}$ in $\mathbb{R}^2$, define the kernel $K_\beta(\vect{x}, \vect{z}) = (1 + \beta \vect{x}^T \vect{z})^3$ for any value $\beta > 0$. 
+ \begin{itemize}
+    \item \problemworth{10} Expand the cubic\footnote{You may use any external program to expand the cubic.}. \\
+    \solution{
+}
+
+    \item \problemworth{10}  Find the corresponding feature map $\phi_\beta(\cdot)$. \\
+    \solution{
+}
+
+    \item \problemworth{10} What are the similarities/differences from the kernel $K(\vect{x}, \vect{z}) = (1 + \vect{x}^T \vect{z})^3$, and what role does the parameter $\beta$ play? [hint: consider different values of $\beta$, e.g., $\beta=1$, $0<\beta<1$, $\beta \rightarrow \infty$, $\beta \rightarrow 0$ and what changes happen in the value of $K_\beta(\vect{x}, \vect{z})$ or what changes happen among different terms in $K_\beta(\vect{x}, \vect{z})$] \\
+    \solution{
+}
+
+ \end{itemize}
+ 
+
+
+\section{SVM \problemworth{20}}
+
+Suppose we are looking for a maximum-margin linear classifier \emph{through the origin}, i.e. $b=0$ (also hard margin, i.e., no slack variables). In other words, we minimize $\frac{1}{2}||\vect{w}||^2$ subject to $y_n \vect{w}^T \vect{x}_n \geq 1, n = 1, \ldots, N$.
+
+\begin{enumerate}
+
+
+\item \problemworth{10} Suppose we have two training examples, $\vect{x}_1 = (1,1)^T$ and $\vect{x}_2 = (1,0)^T$ with labels $y_1 = 1$ and $y_2 = -1$. What is $\vect{w}^\ast$ in this case?
+\solution{
+}
+
+
+\item \problemworth{10} Suppose we now allow the offset parameter $b$ to be non-zero. How would the classifier and the margin change in the previous question? What are $(\vect{w}^\ast, b^\ast)$? Compare your solutions with and without offset.
+\solution{
+}
+
+\end{enumerate}
+
+
+
+\section{Twitter analysis using SVMs \problemworth{50}}\label{sec:intro}
+
+In this project, you will be working with Twitter data. Specifically, we have supplied you with a number of tweets that are reviews/reactions to movies\footnote{Please note that these data were selected at random and thus the content of these tweets do not reflect the views of the course staff. :-)},
+
+e.g., \textit{``@nickjfrost just saw The Boat That Rocked/Pirate Radio and I thought it was brilliant! You and the rest of the cast were fantastic! $<$ 3''.}
+
+You will learn to automatically classify such tweets as either positive or negative reviews. To do this, you will employ Support Vector Machines (SVMs), a popular choice for a large number of classification problems.
+
+Download the code and data sets from the course website. It contains the following data files:
+\begin{itemize}[nosep]
+\item \verb|tweets.txt| contains 630 tweets about movies. Each line in the file contains exactly one tweet, so there are 630 lines in total.
+\item \verb|labels.txt| contains the corresponding labels. If a tweet praises or recommends a movie, it is classified as a positive review and labeled $+1$; otherwise it is classified as a negative review and labeled $-1$. These labels are ordered, i.e. the label for the $i^\textrm{th}$ tweet in \verb|tweets.txt| corresponds to the $i^\textrm{th}$ number in \verb|labels.txt|.
+%\item \verb|held_out_tweets.txt| contains 70 tweets for which we have withheld the labels.
+\end{itemize}
+Skim through the tweets to get a sense of the data.
+%It contains the following data files: \verb|tweets.txt|, \verb|labels.txt|, and \verb|held_out_tweets.txt|. The file \verb|tweets.txt| contains 630 tweets about movies. Each line in the file contains exactly one tweet, so there are 630 lines in total. If a tweet praises or recommends a movie, it is classified as a positive review and labeled $+1$; otherwise it is classified as a negative review and labeled $-1$. These labels are provided separately in \verb|labels.txt|. Additionally, these labels are ordered, i.e. the label for the $i^\textrm{th}$ tweet in \verb|tweets.txt| corresponds to the $i^\textrm{th}$ number in \verb|labels.txt|. We have also provided you with a file \verb|held_out_tweets.txt| containing 70 tweets for which we have withheld the labels. Skim through the tweets to get a sense of the data.
+
+The python file \verb|twitter.py| contains skeleton code for the project. Skim through the code to understand its structure.
+\fi
+
+
+
+
+\subsection{Feature Extraction \problemworth{10}}\label{sec:features}
+
+We will use a bag-of-words model to convert each tweet into a feature vector. A bag-of-words model treats a text file as a collection of words, disregarding word order. The first step in building a bag-of-words model involves building a ``dictionary''. A dictionary contains all of the unique words in the text file. For this project, we will be including punctuations in the dictionary too. For example, a text file containing \textit{``John likes movies. Mary likes movies2!!''} will have a dictionary \verb|{'John':0, 'Mary':1, 'likes':2, 'movies':3, 'movies2':4, '.':5, '!':6}|. Note that the $\verb|(key,value)|$ pairs are $\verb|(word, index)|$, where the index keeps track of the number of unique words (size of the dictionary).
+
+Given a dictionary containing $d$ unique words, we can transform the $n$ variable-length tweets into $n$ feature vectors of length $d$ by setting the $i^\textrm{th}$ element of the $j^\textrm{th}$ feature vector to $1$ if the $i^\textrm{th}$ dictionary word is in the $j^\textrm{th}$ tweet, and $0$ otherwise.
+
+\begin{enumerate}
+
+%\item \problemworth{2} Start by implementing \verb|extract_dictionary(...)| that reads all unique words contained in a file into a dictionary (as in the example above). Initially, you can take a simplistic approach to this problem, treating any string of characters (that does not include a space) as a ``word''. You should also extract and include all unique punctuations. Your function should return dictionary of $d$ unique words/punctuations. You can handle punctuations in a number of different ways. For simplicity you can treat each punctuation mark as a separate entry in the list. [Hint: You might find the list returned by \verb|string.punctuation| and the \verb|str.replace()| method useful.]
+
+\item \problemworth{0} We have implemented \verb|extract_words(...)| that processes an input string to return a list of unique words. This method takes a simplistic approach to the problem, treating any string of characters (that does not include a space) as a ``word'' and also extracting and including all unique punctuations.
+
+Implement \verb|extract_dictionary(...)| that uses \verb|extract_words(...)| to read all unique words contained in a file into a dictionary (as in the example above). Process the tweets in the order they appear in the file to create this dictionary of $d$ unique words/punctuations.
+
+%\item \problemworth{1} We have implemented \verb|extract_dictionary(...)| that reads all unique words contained in a file into a dictionary (as in the example above). This method takes a simplistic approach to this problem, treating any string of characters(that does not include a space) as a ``word'' and also extracting and including all unique punctuations.
+
+\item \problemworth{0} Next, implement \verb|extract_feature_vectors(...)| that produces the bag-of-words representation of a file based on the extracted dictionary. That is, for each tweet $i$, construct a feature vector of length $d$, where the $j^\textrm{th}$ entry in the feature vector is $1$ if the $j^\textrm{th}$ word in the dictionary is present in tweet $i$, or $0$ otherwise. For $n$ tweets, save the feature vectors in a feature matrix, where the rows correspond to tweets (examples) and the columns correspond to words (features). Maintain the order of the tweets as they appear in the file.
+
+\item \problemworth{0} In \verb|main(...)|, we have provided code to read the tweets and labels into a $(630,d)$ feature matrix and $(630,1)$ label array. Split the feature matrix and corresponding labels into your training and test sets. \textbf{The first $560$ tweets will be used for training and the last $70$ tweets will be used for testing.} **All subsequent operations will be performed on these data.**
+\item \problemworth{10} Report the dimensionality of the feature matrix in problem 4.1.(c) in your write-up. 
+\solution{
+}
+\end{enumerate}
+
+
+
+
+
+\subsection{Hyper-parameter Selection for a Linear-Kernel SVM [30 pts]}\label{sec:linear}
+
+Next, we will learn a classifier to separate the training data into positive and negative tweets. For the classifier, we will use SVMs with the linear kernel. We will use the \verb|sklearn.svm.SVC| class\footnote{Note that when using SVMs with the linear kernel, it is recommended to use sklearn.svm.LinearSVC instead of sklearn.svm.SVC because the backbone of sklearn.svm.LinearSVC is the LIBLINEAR library, which is specifically designed for the linear kernel. For the sake of the simplicity, in this problem set we use sklearn.svm.SVC. } and explicitly set only three of the initialization parameters: \verb|kernel|, and \verb|C|. As usual, we will use \verb|SVC.fit(X,y)| to train our SVM, but in lieu of using \verb|SVC.predict(X)| to make predictions, we will use \verb|SVC.decision_function(X)|, which returns the (signed) distance of the samples to the separating hyperplane.
+
+SVMs have hyperparameters that must be set by the user. For both linear kernel SVMs, we will select the hyperparameters using 5-fold cross-validation (CV). Using 5-fold CV, we will select the hyperparameters that lead to the `best' mean performance across all 5 folds.
+
+\begin{enumerate}
+
+\item \problemworth{0} The result of a hyperparameter selection often depends upon the choice of performance measure. Here, we will consider the following performance measures: \textbf{accuracy}, \textbf{F1-Score}, and \textbf{AUROC}\footnote{Read menu \url{http://scikit-learn.org/stable/modules/model_evaluation.html#roc-metrics} to understand the meaning of these evaluation metrics.}.
+
+Implement \verb|performance(...)|. All measures are implemented in \verb|sklearn.metrics| library.
+%You can use \verb|sklearn.metrics.confusion_matrix(...)| to calculate the other two. 
+%When using the \verb|sklearn| functions, watch the order of your parameters, and make sure to use the \verb|labels| parameter if you want the confusion matrix cells to correspond to the order presented in-class.
+
+
+\item \problemworth{10} Next, implement \verb|cv_performance(...)| to return the mean $k$-fold CV performance for the performance metric passed into the function. Here, you will make use of \verb|SVC.fit(X,y)| and \verb|SVC.decision_function(X)|, as well as your \verb|performance(...)| function.
+
+You may have noticed that the proportion of the two classes (positive and negative) are not equal in the training data. When dividing the data into folds for CV, you should try to keep the class proportions roughly the same across folds. In your write-up, briefly describe why it might be beneficial to maintain class proportions across folds. Then, in \verb|main(...)|, use \verb|sklearn.cross_validation.StratifiedKFold(...)| to split the data for $5$-fold CV, making sure to stratify using only the training labels.
+
+\solution{
+}
+
+\item \problemworth{0} Now, implement \verb|select_param_linear(...)| to choose a setting for $C$ for a linear SVM based on the training data and the specified metric. Your function should call \verb|cv_performance(...)|, passing in instances of \verb|SVC(kernel='linear', C=c)| with different values for \verb|C|, e.g., $C = 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 10^{2}$.
+%\solution{
+%[
+%\begin{itemize}[nosep]
+%\item 1 pt for iterating over range of $C$ and returning max score
+%\item 1 pt for using \verb~cv\_performance~ with instances of \verb~SVC~
+%\end{itemize}
+%]
+%}
+
+\item \problemworth{20} Finally, using the training data from Section~\ref{sec:features} and the functions implemented here, find the best setting for $C$ for each performance measure mentioned above. Report your findings in tabular format (up to the fourth decimal place):
+
+\solution{
+}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{c|ccc}% ccc}
+$C$       & accuracy  & F1-score  & AUROC  \\%  & precision & sensitivity      & specificity\\ \hline
+$10^{-3}$ & & & & & & \\
+$10^{-2}$ & & & & & & \\
+$10^{-1}$ & & & & & & \\
+$10^{0}$  & & & & & & \\
+$10^{1}$  & & & & & & \\
+$10^{2}$  & & & & & & \\ \hline
+best $C$  & & & & & & \\
+\end{tabular}
+\end{table}
+
+Your \verb|select_param_linear(...)| function returns the `best' $C$ given a range of values. How does the 5-fold CV performance vary with $C$ and the performance metric?c\\
+\solution{
+}
+
+\end{enumerate}
+
+\subsection{Test Set Performance \problemworth{10}}\label{sec:test}
+In this section, you will apply the  classifier learned in the previous sections to the test data from Section~\ref{sec:features}. Once you have predicted labels for the test data, you will measure performance. 
+\begin{enumerate}
+\item \problemworth{0} Based on the results you obtained in Section~\ref{sec:linear}, choose a hyperparameter setting for the linear-kernel SVM. %Explain your choice.
+Then, in \verb|main(...)|, using the training data extracted in Section~\ref{sec:features} and \verb|SVC.fit(...)|, train a linear-kernel SVM with your chosen settings.
+
+\item \problemworth{0} Implement \verb|performance_test(...)| which returns the value of a performance measure, given the test data and a trained classifier.
+
+\item \problemworth{10} For each performance metric, use \verb|performance_test(...)| and the trained linear-kernel SVM classifier to measure performance on the test data. Report the results. Be sure to include the name of the performance metric employed, and the performance on the test data.
+
+\solution{
+
+\begin{table}[H]
+\footnotesize
+\centering
+\begin{tabular}{c || c|cc }
+            & $C$ & test performance\\%    
+accuracy    &       &  \\
+F1-score    &      &  \\
+AUROC       &      &  \\
+\end{tabular}
+\end{table}
+
+
+
+}
+
+
+\end{enumerate}
+
+
+
+
+
+
+% http://ssdi.di.fct.unl.pt/scl/docs/exercises/soultion6.pdf
+
+
+
+
+\end{document}
