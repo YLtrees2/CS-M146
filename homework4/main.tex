@@ -1,0 +1,264 @@
+\documentclass[11pt]{article}
+\usepackage{course}
+
+\begin{document}
+
+\ctitle{4}{Learning Theory, Boosting, Multi-class Classification}{December 8, 2019, 11:59pm}
+\author{}
+\date{}
+\maketitle
+\vspace{-0.75in}
+
+\vspace{-11pt}
+\ifsoln
+\else
+\section*{Submission instructions}
+\begin{itemize}
+\item 
+Submit your solutions electronically on the course Gradescope site as PDF files.
+\item If you plan to typeset your solutions, please use the LaTeX solution template. If you must submit scanned handwritten solutions, please use a black pen on blank white paper and a high-quality scanner app.
+
+\end{itemize}
+\fi
+
+\section{PAC Learning \problemworth{25}}
+Let $\mathcal{X}$ be a set of numbers \{1,2,\ldots, N\}, and let $H_{Singleton} = \{h_z : z \in \mathcal{X}\}\cup\{h^{-}\}$ is the hypothesis space, where for each $z \in \mathcal{X}$, $h_z$ is the function defined by $h_z(x) = 1$ if $x = z$ and $h_z(x) = 0$ if $x \neq z$. $h^{-}$ is simply the all-negative hypothesis, namely, $\forall x \in X, h^{-}(x) = 0$. (For any hypothesis $h$, it only receives input $x \in \mathcal{X}$, which means the domain is discrete, consisting $N$ numbers).
+
+Assume a training dataset $S_{train}$ consist of $m$ data points drawn i.i.d from a uniform distribution $D$ (each data point $x \in X$ has equal probability, i.e., $\frac{1}{N}$, to be sampled), and that the labels are provided from some target function $h^* \in H_{Singleton}$ (true hypothesis belongs to our learning hypothesis family). We simply choose 0-1 loss as train and generalization error metric.
+\begin{enumerate}
+\item {\bf [10 points]} Describe an algorithm $A$ that learns a hypothesis $A(S_{train})$ from hypothesis family $H_{Singleton}$ on training set $S_{train}$, so that the training error is minimized (such an algorithm is Empirical Risk Minimization (ERM)).
+\item {\bf [15 points]} Prove that if training set $S_{train}$ has a sample size larger than $\frac{\text{log}(1/\sigma)}{\epsilon}$, then the probability that the generalization error of $A(S_{train})$ is larger than $\epsilon$ is at most $\sigma$ (This means that $H_{Singleton}$ is PAC learnable),
+%$A(S_{train})$ will make generalization error at least $\epsilon$,
+i.e.:
+\begin{align}
+    \mathbf{P}\Big(L_{(D,h^*)}\big(A(S_{train})\big)  > \epsilon \Big) \leq \sigma
+\end{align}
+where the generalization error is defined as:
+\begin{align}
+      &L_{(D,h^*)}\big(A(S_{train})\big) \\
+    =\ &\mathbf{E}_{x \sim \mathcal{D}} \Big(\text{0-1-} Loss(h^*(x), A(S_{train})(x))\Big) \\
+    =\ &\mathbf{P}_{x \sim \mathcal{D}}\Big(h^*(x) \neq A(S_{train})(x)\Big)
+\end{align}
+\textbf{Hint}: Write down the generalization error of $A(S_{train})$, estimate the probability that it's larger than $\epsilon$, and bound this probability by $\sigma$. The following inequality is useful: $1-x \leq e^{-x}$.
+
+
+\end{enumerate}
+\solution{
+}
+
+
+
+\section{VC Dimension \problemworth{15}}
+
+We define the following hypothesis set:
+$$H = \{sgn(ax^2 +bx+c); a, b, c,\in R\},$$
+where $sgn(\cdot)$ is $1$ when the argument $\cdot$ is positive, 
+and $0$ otherwise.
+\noindent
+What is the VC dimension of $H$? Prove your claim.
+
+% {\bf Grading note:} You will not get any points without proper justification of your answer.
+
+\solution{}
+
+
+
+\section {Boosting \problemworth{40}}
+  Consider the following examples $(x,y) \in \mathbb{R}^2$ ({\em i} is the example index):
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      {\em i}  & $x$  & $y$ & Label \\
+      \hline
+      {\em 1}  & 0  & 8 & $-$ \\
+      \hline
+      {\em 2}  & 1  & 4 & $-$ \\
+      \hline
+      {\em 3}  & 3  & 7 & $+$ \\
+      \hline
+      {\em 4}  & -2  & 1 & $-$ \\
+      \hline
+      {\em 5}  & -1  & 13 & $-$ \\
+      \hline
+      {\em 6}  & 9  & 11 & $-$ \\
+      \hline
+      {\em 7}  & 12 & 7 & $+$ \\
+      \hline
+      {\em 8}  & -7  & -1 & $-$ \\
+      \hline
+      {\em 9}  & -3  & 12 & $+$ \\
+      \hline
+      {\em 10} & 5  & 9 & $+$ \\
+      \hline
+    \end{tabular}
+  \end{center}
+    % {\bf Add indices to the rows of both tables?}
+
+    \begin{table}[!t]
+      {\centering
+        \begin{tabular}{|c|c||c|c|c|c||c|c|c|c|}
+
+          \hline
+          & & \multicolumn{4}{c||}{Hypothesis 1 (1st iteration)}
+	  & \multicolumn{4}{c|}{Hypothesis 2 (2nd iteration)} \\
+          \cline{3-10}
+          {\em i} & Label & $D_0$ & $f_1 \equiv $ & $f_2 \equiv $ & $h_1\equiv$ & $D_1$ &  $f_1 \equiv $ & $f_2 \equiv $ & $h_2 \equiv $ \\
+          & & & [$x >$\rule[-2pt]{3mm}{0.2pt}$\;$] & [$y >$\rule[-2pt]{3mm}{0.2pt}$\;$] & [$\;$\rule[-2pt]{1cm}{0.2pt}$\;$] & & [$x >$\rule[-2pt]{3mm}{0.2pt}$\;$] & [$y >$\rule[-2pt]{3mm}{0.2pt}$\;$] & [$\;$\rule[-2pt]{1cm}{0.2pt}$\;$] \\
+
+          \tiny{(1)} & \tiny{(2)} & \tiny{(3)} & \tiny{(4)} &  \tiny{(5)} & \tiny{(6)} & \tiny{(7)} & \tiny{(8)} & \tiny{(9)} & \tiny{(10)}\\
+          \hline \hline
+          {\em 1} & $-$ & & & & & & & &  \\
+          \hline
+          {\em 2} & $-$ & & & & & & & &  \\
+          \hline
+          {\em 3} & $+$ & & & & & & & & \\
+          \hline
+          {\em 4} & $-$ & & & & & & & & \\
+          \hline
+          {\em 5} & $-$ & & & & & & & & \\
+          \hline
+          {\em 6} & $-$ & & & & & & & & \\
+          \hline
+          {\em 7} & $+$ & & & & & & & & \\
+          \hline
+          {\em 8} & $-$ & & & & & & & & \\
+          \hline
+          {\em 9} & $+$ & & & & & & & & \\
+          \hline
+          {\em 10} & $+$ & & & & & & & & \\
+          \hline
+        \end{tabular}
+        \caption{Table for Boosting results}\label{table:ltu}}
+    \end{table}
+
+
+  In this problem, you will use Boosting to learn a hidden Boolean function from this set of examples.
+We will use two rounds of AdaBoost to learn a hypothesis for this
+    data set. In each round, AdaBoost chooses a weak learner that minimizes the error $\epsilon$. As weak learners, use hypotheses of the form (a)~$f_1 \equiv [x
+    > \theta_x]$ or (b)~$f_2 \equiv [y > \theta_y]$, for some integers $\theta_x, \theta_y$ (either one of the two forms, not a disjunction of the two). There should be no need to try many values of $\theta_x, \theta_y$;
+    appropriate values should be clear from the data. When using log, use base 2. 
+
+
+  \begin{enumerate}
+  \item {\bf [10 points]}  Start the first round with a uniform distribution $D_0$.  Place the value for
+    $D_0$ for each example in the third column of Table~\ref{table:ltu}.
+Write the new representation of the data in terms of the {\em rules of thumb}, $f_1$ and $f_2$, in the fourth and fifth columns of Table~\ref{table:ltu}.
+
+  \item {\bf [10 points]}
+    Find the hypothesis given by the weak learner that minimizes the error
+    $\epsilon$ for that distribution.  Place this hypothesis as the heading to the
+    sixth column of Table~\ref{table:ltu}, and give its prediction for each example in that column.
+
+   \item {\bf [10 points]} Now compute $D_1$ for each example, find the new best weak learners $f_1$ and $f_2$, and select hypothesis that
+    minimizes error on this distribution, placing these values and
+    predictions in the seventh to tenth columns of Table~\ref{table:ltu}.
+
+  \item {\bf [10 points]} Write down the final hypothesis produced by AdaBoost.
+
+\end{enumerate}
+
+\textbf{What to submit:} Fill out Table~\ref{table:ltu} as explained, show computation of $\alpha$ and $D_1(i)$, and give the final hypothesis, $H_{\textit{final}}$.
+
+
+
+\solution{
+}
+
+
+\iffalse
+\section{AdaBoost \problemworth{30}}
+
+In the lecture on ensemble methods, we said that in iteration $t$, AdaBoost is picking $(h_t, \beta_t)$ that minimizes the objective:
+\begin{eqnarray*}
+(h_t^*(\vect{x}), \beta_t^*) & = & \argmin_{(h_t(\vect{x}), \beta_t)}\sum_n w_t(n) e^{-y_n \beta_t h_t(\vect{x}_n)} \\ 
+& =& \argmin_{(h_t(\vect{x}), \beta_t)}(e^{\beta_t}- e^{-\beta_t})  \sum_n w_t(n)\mathbb{I}[y_n \ne h_t(\vect{x}_n)] \\
+&& \qquad\qquad\qquad\qquad\qquad + e^{-\beta_t} \sum_n w_t(n)
+\end{eqnarray*}
+We define the weighted misclassification error at time t, $\epsilon_t$ to be $\epsilon_t = \sum_n w_t(n)\mathbb{I}[y_n \ne h_t(\vect{x}_n)]$. Also the weights are normalized so that $\sum_n w_t(n)=1$. 
+
+\begin{enumerate}
+\item \itemworth{3}
+Take the derivative of the above objective function with respect to $\beta_t$ and set it to zero to solve for $\beta_t$ and obtain the update for $\beta_t$.
+
+\solution{
+\begin{eqnarray*}
+J(\beta) & =& (e^{\beta_t}- e^{-\beta_t})  \epsilon_t  + e^{-\beta_t} 
+\end{eqnarray*}
+\begin{eqnarray*}
+\frac{\itemial J(\beta_t)}{\itemial \beta_t} & =& (e^{\beta_t}+ e^{-\beta_t})  \epsilon_t  - e^{-\beta_t} \\
+&=& 0 
+\end{eqnarray*}
+Solving gives:
+\begin{eqnarray*}
+e^{2\beta_t}+ 1  &=& \frac{1}{\epsilon_t} \\
+e^{2\beta_t}  &=& \frac{1-\epsilon_t}{\epsilon_t} \\
+\beta_t  &=& \frac{1}{2} \log\left(\frac{1-\epsilon_t}{\epsilon_t}\right)
+\end{eqnarray*}
+
+%[2pt for computing the derivative correctly; 1 pt for answer]
+}
+
+\item \itemworth{2} Suppose the training set is linearly separable, and we use a hard-margin linear support vector machine (no slack) as a base classifier. In the first boosting iteration, what would the resulting $\beta_1$ be?
+
+\solution{
+}
+\end{enumerate}
+\fi
+\section{Multi-class classification \problemworth{60}}
+
+Consider a multi-class classification problem with $k$ class
+labels $\{1, 2, \ldots k\}$. Assume that we are given $m$
+examples, labeled with one of the $k$ class labels. Assume, for
+simplicity, that we have $m/k$ examples of each type.
+
+Assume that you have a learning algorithm $L$ that can be used
+to learn Boolean functions. (E.g., think about $L$ as the
+Perceptron algorithm). We would like to explore several ways to
+develop learning algorithms for the multi-class classification
+problem.
+
+There are two schemes to use the algorithm $L$ on the given data set, and produce a multi-class classification:
+\begin{itemize}
+\item {\bf One vs.~All:} For every label $i \in [1,k]$, a classifier is learned over the following data set: the examples labeled with the label $i$ are considered ``positive'', and examples labeled with any other class $j \in [1,k], j \neq i$ are considered ``negative''.
+\item {\bf All vs.~All:} For every pair of labels $\langle i, j \rangle$, a classifier is learned over the following data set: the examples labeled with one class $i \in [1,k]$ are considered ``positive'', and those labeled with the other class $j \in [1,k], j \neq i$ are considered ``negative''.
+\end{itemize}
+%
+\vspace{-3mm}
+\begin{enumerate}
+\item {\bf [20 points]} For each of these two schemes, answer the following:
+\begin{enumerate}
+\item How many classifiers do you learn?
+\item How many examples do you use to learn each classifier within the scheme?
+\item How will you decide the final class label (from \{1, 2, \ldots, k\}) for each example?
+\item What is the computational complexity of the training process?
+\end{enumerate}
+\item {\bf [5 points]} Based on your analysis above of two schemes individually, which scheme would you prefer? Justify.
+\item {\bf [5 points]} You could also use a \textsc{KernelPerceptron} for a two-class classification. We could also use the algorithm to learn a multi-class classification. Does using a \textsc{KernelPerceptron} change your analysis above? Specifically, what is the computational complexity of using a \textsc{KernelPerceptron} and which scheme would you prefer when using a \textsc{KernelPerceptron}? 
+
+\item {\bf [10 points]} We are given a magical black-box binary classification algorithm (we don’t know how it works, but it just does!) which has a learning time complexity of O($dn^2$), where $n$ is the total number of training examples supplied (positive+negative) and $d$ is the dimensionality of each example.
+What are the overall training time complexities of the all-vs-all and the one-vs-all
+paradigms, respectively, and which training paradigm is most efficient?
+
+\item {\bf [10 points]} We are now given another magical black-box binary classification algorithm (wow!) which has a learning time complexity of O($d^2 n$), where $n$ is the total number of training examples supplied (positive+negative) and $d$ is the dimensionality of each example.
+What are the overall training time complexities of the all-vs-all and the one-vs-all paradigms, respectively, and which training paradigm is most efficient, when using this new classifier?
+
+\item {\bf [10 points]} Suppose we have learnt an all-vs-all multi-class classifier and now want to proceed to predicting labels on unseen examples.
+
+We have learnt a simple linear classifier with a weight vector of dimensionality $d$ for each of the $ k(k-1)/2$ classifier ($w_i^T x = 0$ is the simple linear classifier hyperplane for each  $i =[1, \cdots , k(k-1)/2] )$
+
+We have two evaluation strategies to choose from. For each example, we can:
+\begin{itemize}
+  \item \textbf{Counting}: Do all predictions then do a majority vote to decide class label
+  \item \textbf{Knockout}: Compare two classes at a time, if one loses, never consider it
+again. Repeat till only one class remains.
+\end{itemize}
+What are the overall evaluation time complexities per example for Counting and
+Knockout, respectively?
+
+\solution{
+}
+
+\end{enumerate}
+
+
+\end{document}
